@@ -1,0 +1,166 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String   @id @default(uuid())
+  name             String
+  email            String   @unique
+  password         String
+  subscriptionPlan     String   @default("starter")
+  stripeCustomerId     String?
+  stripeSubscriptionId String?
+  createdAt            DateTime @default(now())
+  leads            Lead[]
+  campaigns        EmailCampaign[]
+  documents        Document[]
+  sellers          Seller[]
+  buyerLists       BuyerList[]
+  emailSequences   EmailSequence[]
+}
+
+model Buyer {
+  id              String   @id @default(uuid())
+  companyName     String
+  country         String
+  industry        String
+  productCategory String
+  email           String?
+  website         String?
+  phone           String?
+  linkedin        String?
+  source          String?  @default("system")
+  emailVerified   Boolean  @default(false)
+  websiteActive   Boolean  @default(false)
+  companySize     String?
+  verificationScore Int    @default(0)
+  createdAt       DateTime @default(now())
+  leads           Lead[]
+  campaigns       EmailCampaign[]
+  listItems       BuyerListItem[]
+
+  @@index([country])
+  @@index([industry])
+  @@index([productCategory])
+}
+
+model Seller {
+  id              String   @id @default(uuid())
+  companyName     String
+  country         String
+  industry        String
+  productCategory String
+  email           String?
+  website         String?
+  phone           String?
+  linkedin        String?
+  source          String?  @default("system")
+  createdAt       DateTime @default(now())
+  leads           Lead[]
+  campaigns       EmailCampaign[]
+
+  user            User?    @relation(fields: [userId], references: [id])
+  userId          String?
+
+  @@index([country])
+  @@index([industry])
+  @@index([productCategory])
+}
+
+model Lead {
+  id        String   @id @default(uuid())
+  userId    String
+  buyerId   String?
+  sellerId  String?
+  status    String   @default("New Lead") // New Lead, Contacted, Negotiation, Deal Closed
+  notes     String?
+  dealValue Float?   @default(0)
+  createdAt DateTime @default(now())
+
+  user   User    @relation(fields: [userId], references: [id])
+  buyer  Buyer?  @relation(fields: [buyerId], references: [id])
+  seller Seller? @relation(fields: [sellerId], references: [id])
+}
+
+model EmailCampaign {
+  id           String   @id @default(uuid())
+  userId       String
+  buyerId      String?
+  sellerId     String?
+  emailSubject String
+  emailBody    String
+  status       String   @default("sent") // sent, sending, scheduled
+  opened       Boolean  @default(false)
+  replied      Boolean  @default(false)
+  sentAt       DateTime @default(now())
+  scheduledAt  DateTime?
+  sequenceId   String?
+  sequenceStepId String?
+
+  user         User    @relation(fields: [userId], references: [id])
+  buyer        Buyer?  @relation(fields: [buyerId], references: [id])
+  seller       Seller? @relation(fields: [sellerId], references: [id])
+  sequence     EmailSequence?      @relation(fields: [sequenceId], references: [id])
+  sequenceStep EmailSequenceStep?  @relation(fields: [sequenceStepId], references: [id])
+}
+
+model Document {
+  id           String   @id @default(uuid())
+  userId       String
+  documentType String
+  buyerName    String
+  product      String
+  price        Float
+  date         DateTime @default(now())
+  pdfUrl       String?
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model BuyerList {
+  id        String          @id @default(uuid())
+  name      String
+  userId    String
+  createdAt DateTime        @default(now())
+  
+  user      User            @relation(fields: [userId], references: [id])
+  items     BuyerListItem[]
+}
+
+model BuyerListItem {
+  id        String    @id @default(uuid())
+  listId    String
+  buyerId   String
+  createdAt DateTime  @default(now())
+
+  list      BuyerList @relation(fields: [listId], references: [id])
+  buyer     Buyer     @relation(fields: [buyerId], references: [id])
+}
+
+model EmailSequence {
+  id        String              @id @default(uuid())
+  name      String
+  userId    String
+  createdAt DateTime            @default(now())
+
+  user      User                @relation(fields: [userId], references: [id])
+  steps     EmailSequenceStep[]
+  campaigns EmailCampaign[]
+}
+
+model EmailSequenceStep {
+  id         String          @id @default(uuid())
+  sequenceId String
+  subject    String
+  body       String
+  delayDays  Int
+  stepOrder  Int
+
+  sequence   EmailSequence   @relation(fields: [sequenceId], references: [id])
+  campaigns  EmailCampaign[]
+}
