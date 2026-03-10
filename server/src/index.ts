@@ -13,6 +13,7 @@ import listsRouter from './routes/lists';
 import exportRouter from './routes/export';
 import emailSequencesRouter from './routes/email-sequences';
 import marketInsightsRouter from './routes/market-insights';
+import importersRouter from './routes/importers';
 import { startEmailCronJob } from './cron';
 
 const app = express();
@@ -29,6 +30,7 @@ app.use('/api/lists', listsRouter);
 app.use('/api/export', exportRouter);
 app.use('/api/email-sequences', emailSequencesRouter);
 app.use('/api/market-insights', marketInsightsRouter);
+app.use('/api/importers', importersRouter);
 
 app.get('/health', (req, res) => {
     res.json({ status: 'ok', message: 'Expo & Impo API is running' });

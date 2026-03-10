@@ -1,7 +1,8 @@
-import { parse } from 'csv-parse';
 import { calculateVerificationScore } from '../src/utils/verificationScore';
 import csvParser from 'csv-parser';
 import path from 'path';
+import * as fs from 'fs';
+import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -20,12 +21,13 @@ async function main() {
 
     fs.createReadStream(csvFilePath)
         .pipe(csvParser())
-        .on('data', (data) => results.push(data))
+        .on('data', (data: any) => results.push(data))
         .on('end', async () => {
-            console.log(`Parsed ${results.length} records.`);
+            console.log(`Parsed ${results.length} records. Beginning sequential import...`);
 
-            const buyersToInsert: any[] = [];
-            const sellersToInsert: any[] = [];
+            let buyersInserted = 0;
+            let sellersInserted = 0;
+            let duplicatesSkipped = 0;
 
             for (const row of results) {
                 const companyName = row['Business Name'] || 'Unknown Company';
@@ -37,56 +39,75 @@ async function main() {
 
                 const category = row['Category'] || 'Agriculture';
 
+                if (companyName === 'Unknown Company') {
+                    continue;
+                }
+
                 const scoreData = {
                     email,
                     emailVerified: email ? true : false,
                     website,
                     websiteActive: website ? true : false,
-                    linkedin, // Use the extracted linkedin
+                    linkedin,
                 };
+
+                const country = 'United Arab Emirates';
+
+                // Duplicate Check
+                const existingBuyer = await prisma.buyer.findFirst({
+                    where: {
+                        companyName: {
+                            equals: companyName,
+                            mode: 'insensitive'
+                        },
+                        country: {
+                            equals: country,
+                            mode: 'insensitive'
+                        }
+                    }
+                });
+
+                if (existingBuyer) {
+                    duplicatesSkipped++;
+                    continue; // Skip this record to prevent duplicates
+                }
 
                 const record = {
                     companyName,
-                    country: 'United Arab Emirates', // Sourced from UAE list
+                    country: country,
                     industry: 'Agriculture',
                     productCategory: category,
                     email,
                     website,
                     phone,
                     linkedin,
-                    source: 'agriculture_production_csv',
+                    source: 'agricultural_production_csv',
                     emailVerified: scoreData.emailVerified,
                     websiteActive: scoreData.websiteActive,
                     verificationScore: calculateVerificationScore(scoreData)
                 };
 
-                buyersToInsert.push(record);
-                sellersToInsert.push(record);
+                try {
+                    await prisma.buyer.create({ data: record });
+                    buyersInserted++;
+
+                    // Also populate the Seller table for this user as per previous logic
+                    await prisma.seller.create({ data: record });
+                    sellersInserted++;
+                } catch (err) {
+                    console.error(`Failed to insert record: ${companyName}`);
+                    console.error(err);
+                }
             }
 
-            try {
-                console.log(`Inserting ${buyersToInsert.length} buyers...`);
-                // We use createMany and skipDuplicates if there were Unique constraints.
-                // Since we don't have unique constraints on companyName, this will insert duplicates if run twice.
-                const createdBuyers = await prisma.buyer.createMany({
-                    data: buyersToInsert,
-                    skipDuplicates: true
-                });
-                console.log(`Successfully inserted ${createdBuyers.count} buyers.`);
+            console.log(`\nImport Summary:`);
+            console.log(`----------------`);
+            console.log(`New Buyers Inserted: ${buyersInserted}`);
+            console.log(`New Sellers Inserted: ${sellersInserted}`);
+            console.log(`Duplicates Skipped: ${duplicatesSkipped}`);
+            console.log('Import complete.');
 
-                console.log(`Inserting ${sellersToInsert.length} sellers...`);
-                const createdSellers = await prisma.seller.createMany({
-                    data: sellersToInsert,
-                    skipDuplicates: true
-                });
-                console.log(`Successfully inserted ${createdSellers.count} sellers.`);
-
-                console.log('Import complete.');
-            } catch (error) {
-                console.error('Error inserting data:', error);
-            } finally {
-                await prisma.$disconnect();
-            }
+            await prisma.$disconnect();
         });
 }
 

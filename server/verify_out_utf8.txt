@@ -1,0 +1,55 @@
+﻿Verified CSV Buyers via Prisma: 140
+Verified CSV Sellers via Prisma: 0
+[
+  {
+    "id": "00b6a3f7-2b2f-4dd7-aaa2-6a7b7eb920ea",
+    "companyName": "Ruwais Tanker Filling Point for TSE Water",
+    "country": "United Arab Emirates",
+    "industry": "Agriculture",
+    "productCategory": "Sewage treatment plant",
+    "email": null,
+    "website": null,
+    "phone": "+971 56 390 1007",
+    "linkedin": null,
+    "source": "agricultural_production_csv",
+    "emailVerified": false,
+    "websiteActive": false,
+    "companySize": null,
+    "verificationScore": 0,
+    "createdAt": "2026-03-09T09:23:06.832Z"
+  },
+  {
+    "id": "048cd11b-c84b-44ee-ad0f-3d8271a93261",
+    "companyName": "National Industrial Co. W.L.L - Al Ain Branch",
+    "country": "United Arab Emirates",
+    "industry": "Agriculture",
+    "productCategory": "Agricultural service",
+    "email": "na_agri@emirates.net.ae",
+    "website": "http://www.nicuae.com/",
+    "phone": "+971 3 764 1614",
+    "linkedin": "https://www.linkedin.com/company/national-industrial-co/mycompany/",
+    "source": "agricultural_production_csv",
+    "emailVerified": true,
+    "websiteActive": true,
+    "companySize": null,
+    "verificationScore": 10,
+    "createdAt": "2026-03-09T09:22:50.435Z"
+  },
+  {
+    "id": "08e01642-cee6-428f-ae6c-69b2ea8972ee",
+    "companyName": "┘à╪▓╪▒╪╣╪⌐",
+    "country": "United Arab Emirates",
+    "industry": "Agriculture",
+    "productCategory": "Tree farm",
+    "email": null,
+    "website": null,
+    "phone": null,
+    "linkedin": null,
+    "source": "agricultural_production_csv",
+    "emailVerified": false,
+    "websiteActive": false,
+    "companySize": null,
+    "verificationScore": 0,
+    "createdAt": "2026-03-09T09:22:50.123Z"
+  }
+]

@@ -65,6 +65,7 @@ export default function DashboardLayout({
                         type="button"
                         className="lg:hidden p-2 text-zinc-500 hover:text-zinc-700"
                         onClick={() => setSidebarOpen(false)}
+                        suppressHydrationWarning
                     >
                         <X className="w-5 h-5" />
                     </button>
@@ -106,6 +107,7 @@ export default function DashboardLayout({
                     <button
                         onClick={() => window.location.href = "/"}
                         className="w-full mt-1 flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-red-600 hover:bg-red-50 transition-colors"
+                        suppressHydrationWarning
                     >
                         <LogOut className="w-5 h-5 text-red-500" />
                         Sign out
@@ -121,6 +123,7 @@ export default function DashboardLayout({
                         type="button"
                         className="-m-2.5 p-2.5 text-zinc-700 lg:hidden"
                         onClick={() => setSidebarOpen(true)}
+                        suppressHydrationWarning
                     >
                         <span className="sr-only">Open sidebar</span>
                         <Menu className="h-6 w-6" aria-hidden="true" />
@@ -128,7 +131,7 @@ export default function DashboardLayout({
 
                     <div className="flex flex-1 justify-end gap-x-4 self-stretch lg:gap-x-6">
                         <div className="flex items-center gap-x-4 lg:gap-x-6">
-                            <button type="button" className="-m-2.5 p-2.5 text-zinc-400 hover:text-zinc-500">
+                            <button type="button" className="-m-2.5 p-2.5 text-zinc-400 hover:text-zinc-500" suppressHydrationWarning>
                                 <span className="sr-only">View notifications</span>
                                 <Bell className="h-6 w-6" aria-hidden="true" />
                             </button>
