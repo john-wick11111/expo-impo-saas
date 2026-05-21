@@ -12,7 +12,7 @@ export default function SettingsPage() {
     const [company, setCompany] = useState("Emzii");
 
     return (
-        <div className="max-w-5xl mx-auto space-y-8 pb-12">
+        <div className="max-w-5xl mx-auto px-4 md:px-8 pt-6 space-y-8 pb-12">
             <div>
                 <h1 className="text-3xl font-bold tracking-tight text-zinc-900">Settings</h1>
                 <p className="text-zinc-500 mt-1">Manage your account settings and preferences.</p>
