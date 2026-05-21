@@ -198,7 +198,7 @@ export default function MarketInsightsPage() {
                             <XAxis dataKey="month" tick={{ fill: "#a1a1aa", fontSize: 12 }} axisLine={false} tickLine={false} />
                             <YAxis tick={{ fill: "#a1a1aa", fontSize: 12 }} axisLine={false} tickLine={false} tickFormatter={v => `${(v/1000).toFixed(0)}k`} />
                             <Tooltip
-                                formatter={(value: number) => [`${(value/1000).toFixed(1)}k shipments`, "Volume"]}
+                                formatter={(value: any) => [`${(Number(value)/1000).toFixed(1)}k shipments`, "Volume"]}
                                 contentStyle={{ borderRadius: "12px", border: "1px solid #e4e4e7", fontSize: 12 }}
                                 cursor={{ fill: "#f4f4f5" }}
                             />
@@ -233,7 +233,7 @@ export default function MarketInsightsPage() {
                                     <Cell key={index} fill={entry.fill} />
                                 ))}
                             </Pie>
-                            <Tooltip formatter={(v: number) => [`${v}%`, "Share"]} contentStyle={{ borderRadius: "12px", border: "1px solid #e4e4e7", fontSize: 12 }} />
+                            <Tooltip formatter={(v: any) => [`${v}%`, "Share"]} contentStyle={{ borderRadius: "12px", border: "1px solid #e4e4e7", fontSize: 12 }} />
                         </PieChart>
                     </ResponsiveContainer>
                     <div className="space-y-2 mt-2">
