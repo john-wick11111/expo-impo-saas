@@ -56,7 +56,7 @@ function LeadsPageContent() {
                 setHasSearched(true);
                 setIsLoading(true);
                 try {
-                    const response = await fetch(`http://localhost:5000/api/buyers/search?q=${encodeURIComponent(query)}`);
+                    const response = await fetch(`https://expo-impo-saas.onrender.com/api/buyers/search?q=${encodeURIComponent(query)}`);
                     if (response.ok) {
                         const data = await response.json();
                         setResults(data);
@@ -89,7 +89,7 @@ function LeadsPageContent() {
                 if (topFilters.country) params.set('country', topFilters.country);
                 if (topFilters.industry) params.set('industry', topFilters.industry);
                 if (topFilters.productCategory) params.set('productCategory', topFilters.productCategory);
-                const url = `http://localhost:5000/api/buyers/top-performing?${params.toString()}`;
+                const url = `https://expo-impo-saas.onrender.com/api/buyers/top-performing?${params.toString()}`;
                 const res = await fetch(url);
                 if (res.ok) setTopBuyers(await res.json());
             } catch { /* silently fail */ }
@@ -101,7 +101,7 @@ function LeadsPageContent() {
     const handleSaveTopLead = async (buyerId: string) => {
         setSavingTopLeadId(buyerId);
         try {
-            const res = await fetch('http://localhost:5000/api/crm/leads', {
+            const res = await fetch('https://expo-impo-saas.onrender.com/api/crm/leads', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ buyerId, status: 'New Lead' })
@@ -147,7 +147,7 @@ function LeadsPageContent() {
     const handleSaveLead = async (buyerId: string) => {
         try {
             setSavingLeadId(buyerId);
-            const response = await fetch('http://localhost:5000/api/crm/leads', {
+            const response = await fetch('https://expo-impo-saas.onrender.com/api/crm/leads', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

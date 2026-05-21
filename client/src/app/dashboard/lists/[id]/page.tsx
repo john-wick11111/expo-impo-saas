@@ -36,7 +36,7 @@ export default function ListDetailsPage({ params }: { params: Promise<{ id: stri
     const fetchListDetails = async () => {
         setIsLoading(true);
         try {
-            const res = await fetch(`http://localhost:5000/api/lists/${id}`);
+            const res = await fetch(`https://expo-impo-saas.onrender.com/api/lists/${id}`);
             if (res.ok) {
                 const data = await res.json();
                 setList(data);
@@ -57,7 +57,7 @@ export default function ListDetailsPage({ params }: { params: Promise<{ id: stri
 
         setRemovingId(buyerId);
         try {
-            const res = await fetch(`http://localhost:5000/api/lists/${id}/buyers/${buyerId}`, {
+            const res = await fetch(`https://expo-impo-saas.onrender.com/api/lists/${id}/buyers/${buyerId}`, {
                 method: "DELETE"
             });
 
@@ -76,7 +76,7 @@ export default function ListDetailsPage({ params }: { params: Promise<{ id: stri
 
     const handleSaveToCRM = async (buyerId: string) => {
         try {
-            const res = await fetch('http://localhost:5000/api/crm/leads', {
+            const res = await fetch('https://expo-impo-saas.onrender.com/api/crm/leads', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ buyerId, status: 'New Lead' })

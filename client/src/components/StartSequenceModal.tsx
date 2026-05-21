@@ -24,7 +24,7 @@ export default function StartSequenceModal({ buyerIds, onClose }: StartSequenceM
     useEffect(() => {
         const fetchSequences = async () => {
             try {
-                const res = await fetch("http://localhost:5000/api/email-sequences");
+                const res = await fetch("https://expo-impo-saas.onrender.com/api/email-sequences");
                 if (res.ok) {
                     const data = await res.json();
                     setSequences(data);
@@ -46,7 +46,7 @@ export default function StartSequenceModal({ buyerIds, onClose }: StartSequenceM
         setSuccessMessage("");
 
         try {
-            const res = await fetch("http://localhost:5000/api/email-sequences/start", {
+            const res = await fetch("https://expo-impo-saas.onrender.com/api/email-sequences/start", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({

@@ -203,7 +203,7 @@ function AutomatedSequencesTab() {
 
     const fetchSequences = async () => {
         try {
-            const res = await fetch("http://localhost:5000/api/email-sequences");
+            const res = await fetch("https://expo-impo-saas.onrender.com/api/email-sequences");
             const data = await res.json();
             setSequences(data);
         } catch {
@@ -246,8 +246,8 @@ function AutomatedSequencesTab() {
         try {
             const method = editingSequence ? "PUT" : "POST";
             const url = editingSequence
-                ? `http://localhost:5000/api/email-sequences/${editingSequence.id}`
-                : "http://localhost:5000/api/email-sequences";
+                ? `https://expo-impo-saas.onrender.com/api/email-sequences/${editingSequence.id}`
+                : "https://expo-impo-saas.onrender.com/api/email-sequences";
             const res = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, steps }) });
             if (res.ok) { fetchSequences(); handleCloseModal(); }
             else alert("Failed to save sequence");
@@ -257,7 +257,7 @@ function AutomatedSequencesTab() {
     const handleDeleteSequence = async (id: string) => {
         if (!confirm("Are you sure you want to delete this sequence?")) return;
         try {
-            const res = await fetch(`http://localhost:5000/api/email-sequences/${id}`, { method: "DELETE" });
+            const res = await fetch(`https://expo-impo-saas.onrender.com/api/email-sequences/${id}`, { method: "DELETE" });
             if (res.ok) fetchSequences();
         } catch { /* silent */ }
     };

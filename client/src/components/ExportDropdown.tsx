@@ -27,7 +27,7 @@ export default function ExportDropdown({ source, listId, searchQuery, className 
 
     const handleExport = (format: "csv" | "excel") => {
         // Build the URL with query parameters
-        const url = new URL("http://localhost:5000/api/export/leads");
+        const url = new URL("https://expo-impo-saas.onrender.com/api/export/leads");
         url.searchParams.append("format", format);
         url.searchParams.append("source", source);
 

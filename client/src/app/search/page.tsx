@@ -24,7 +24,7 @@ function SearchResultsContent() {
             setIsLoading(true);
             try {
                 // Reusing the buyers search API
-                const response = await fetch(`http://localhost:5000/api/buyers/search?q=${encodeURIComponent(query)}`);
+                const response = await fetch(`https://expo-impo-saas.onrender.com/api/buyers/search?q=${encodeURIComponent(query)}`);
                 if (response.ok) {
                     const data = await response.json();
                     setResults(data);
@@ -45,7 +45,7 @@ function SearchResultsContent() {
     const handleSaveLead = async (buyerId: string) => {
         try {
             setSavingLeadId(buyerId);
-            const response = await fetch('http://localhost:5000/api/crm/leads', {
+            const response = await fetch('https://expo-impo-saas.onrender.com/api/crm/leads', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ buyerId, status: 'New Lead' })

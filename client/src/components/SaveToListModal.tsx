@@ -23,7 +23,7 @@ export default function SaveToListModal({ buyerId, onClose }: SaveToListModalPro
     useEffect(() => {
         const fetchLists = async () => {
             try {
-                const res = await fetch("http://localhost:5000/api/lists");
+                const res = await fetch("https://expo-impo-saas.onrender.com/api/lists");
                 if (res.ok) {
                     const data = await res.json();
                     setLists(data);
@@ -45,7 +45,7 @@ export default function SaveToListModal({ buyerId, onClose }: SaveToListModalPro
         setSuccessMessage("");
 
         try {
-            const res = await fetch("http://localhost:5000/api/lists/add-buyer", {
+            const res = await fetch("https://expo-impo-saas.onrender.com/api/lists/add-buyer", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({

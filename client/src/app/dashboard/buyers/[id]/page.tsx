@@ -52,7 +52,7 @@ export default function BuyerProfile({ params }: { params: Promise<{ id: string 
         const fetchBuyer = async () => {
             try {
                 // Assuming dev server is running on localhost:5000
-                const response = await fetch(`http://localhost:5000/api/buyers/${id}`);
+                const response = await fetch(`https://expo-impo-saas.onrender.com/api/buyers/${id}`);
                 if (response.ok) {
                     const data = await response.json();
                     setBuyer(data);
@@ -76,7 +76,7 @@ export default function BuyerProfile({ params }: { params: Promise<{ id: string 
 
         try {
             setIsSaving(true);
-            const response = await fetch('http://localhost:5000/api/crm/leads', {
+            const response = await fetch('https://expo-impo-saas.onrender.com/api/crm/leads', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

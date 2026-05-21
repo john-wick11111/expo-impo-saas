@@ -89,7 +89,7 @@ export default function SubscriptionPage() {
     const handleSelectPlan = async (priceId: string, planId: string) => {
         try {
             setIsLoading(planId);
-            const response = await fetch("http://localhost:5000/api/stripe/create-checkout", {
+            const response = await fetch("https://expo-impo-saas.onrender.com/api/stripe/create-checkout", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ priceId }),

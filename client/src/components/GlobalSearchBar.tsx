@@ -43,7 +43,7 @@ export function GlobalSearchBar({
             if (debouncedQuery.trim().length >= 2) {
                 setIsLoading(true);
                 try {
-                    const res = await fetch(`http://localhost:5000/api/buyers/suggestions?q=${encodeURIComponent(debouncedQuery.trim())}`);
+                    const res = await fetch(`https://expo-impo-saas.onrender.com/api/buyers/suggestions?q=${encodeURIComponent(debouncedQuery.trim())}`);
                     if (res.ok) {
                         const data = await res.json();
                         setSuggestions(data);
