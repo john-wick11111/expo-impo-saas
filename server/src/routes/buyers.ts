@@ -3,6 +3,101 @@ import { prisma } from '../index';
 
 const router = Router();
 
+// GET /api/buyers/top-performing
+router.get('/top-performing', async (req, res) => {
+    try {
+        const { country, industry, productCategory } = req.query;
+
+        const where: any = {};
+        if (country && typeof country === 'string') {
+            where.country = { contains: country, mode: 'insensitive' };
+        }
+        if (industry && typeof industry === 'string') {
+            where.industry = { contains: industry, mode: 'insensitive' };
+        }
+        if (productCategory && typeof productCategory === 'string') {
+            where.productCategory = { contains: productCategory, mode: 'insensitive' };
+        }
+
+        const buyers = await prisma.buyer.findMany({
+            where,
+            orderBy: { verificationScore: 'desc' },
+            take: 8,
+            select: {
+                id: true,
+                companyName: true,
+                country: true,
+                industry: true,
+                productCategory: true,
+                website: true,
+                email: true,
+                verificationScore: true,
+            }
+        });
+
+        res.json(buyers);
+    } catch (error) {
+        console.error('Error fetching top-performing buyers:', error);
+        res.status(500).json({ error: 'Failed to fetch top-performing buyers' });
+    }
+});
+
+// GET /api/buyers/suggestions
+router.get('/suggestions', async (req, res) => {
+    try {
+        const { q } = req.query;
+        if (!q || typeof q !== 'string' || q.length < 2) {
+            return res.json([]);
+        }
+
+        // Query the database for buyers matching the query in category, industry, or country
+        const buyers = await prisma.buyer.findMany({
+            where: {
+                OR: [
+                    { productCategory: { contains: q, mode: 'insensitive' } },
+                    { industry: { contains: q, mode: 'insensitive' } },
+                    { country: { contains: q, mode: 'insensitive' } }
+                ]
+            },
+            select: {
+                productCategory: true,
+                industry: true,
+                country: true,
+                companyName: true
+            },
+            take: 20
+        });
+
+        const suggestionsSet = new Set<string>();
+
+        // Generate combinations like "{product} buyers {country}"
+        buyers.forEach(buyer => {
+            if (buyer.productCategory && buyer.country) {
+                // E.g., "fertilizer buyers UAE"
+                suggestionsSet.add(`${buyer.productCategory.toLowerCase()} buyers ${buyer.country}`);
+            }
+            if (buyer.industry && buyer.country) {
+                // E.g., "Agriculture distributors UAE"
+                suggestionsSet.add(`${buyer.industry.toLowerCase()} distributors ${buyer.country}`);
+            }
+            if (buyer.companyName) {
+                suggestionsSet.add(buyer.companyName);
+            }
+        });
+
+        // Filter out specific matches to the query and limit to 6
+        const queryLower = q.toLowerCase();
+        const finalSuggestions = Array.from(suggestionsSet)
+            .filter(s => s.toLowerCase().includes(queryLower))
+            .slice(0, 6);
+
+        res.json(finalSuggestions);
+    } catch (error) {
+        console.error('Error fetching suggestions:', error);
+        res.status(500).json({ error: 'Failed to fetch suggestions' });
+    }
+});
+
 // GET /api/buyers/search
 router.get('/search', async (req, res) => {
     try {

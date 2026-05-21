@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import ShipsBackground from "@/components/ShipsBackground";
 import {
     Users,
     Search,
@@ -14,7 +15,7 @@ import {
     Bell,
     LogOut,
     X,
-    CreditCard,
+    Layers,
     List as ListIcon,
     BarChart3
 } from "lucide-react";
@@ -24,11 +25,10 @@ const navigation = [
     { name: "Lead Generator", href: "/dashboard/leads", icon: Search },
     { name: "Saved Lists", href: "/dashboard/lists", icon: ListIcon },
     { name: "CRM Pipeline", href: "/dashboard/crm", icon: Users },
-    { name: "Email Outreach", href: "/dashboard/email", icon: Mail },
-    { name: "Email Sequences", href: "/dashboard/email-sequences", icon: Mail },
+    { name: "Email Campaigns", href: "/dashboard/email-campaigns", icon: Mail },
     { name: "Market Insights", href: "/dashboard/market-insights", icon: BarChart3 },
     { name: "Export Documents", href: "/dashboard/documents", icon: FileText },
-    { name: "Pricing", href: "/dashboard/pricing", icon: CreditCard },
+    { name: "Subscription", href: "/dashboard/subscription", icon: Layers },
 ];
 
 export default function DashboardLayout({
@@ -98,12 +98,6 @@ export default function DashboardLayout({
                         <Settings className="w-5 h-5 text-zinc-400" />
                         Settings
                     </Link>
-                    <Link
-                        href="/dashboard/settings/billing"
-                        className="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 transition-colors pl-8 text-sm border-l-2 border-transparent hover:border-zinc-300 ml-3"
-                    >
-                        Billing
-                    </Link>
                     <button
                         onClick={() => window.location.href = "/"}
                         className="w-full mt-1 flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-red-600 hover:bg-red-50 transition-colors"
@@ -118,7 +112,7 @@ export default function DashboardLayout({
             {/* Main Content */}
             <div className="flex flex-1 flex-col overflow-hidden">
                 {/* Top Header */}
-                <header className="flex h-16 shrink-0 items-center justify-between gap-x-4 border-b border-zinc-200 bg-white px-4 sm:px-6 lg:px-8">
+                <header className="relative z-10 flex h-16 shrink-0 items-center justify-between gap-x-4 border-b border-zinc-200 bg-white px-4 sm:px-6 lg:px-8">
                     <button
                         type="button"
                         className="-m-2.5 p-2.5 text-zinc-700 lg:hidden"
@@ -154,8 +148,11 @@ export default function DashboardLayout({
                 </header>
 
                 {/* Main Area */}
-                <main className="flex-1 overflow-y-auto bg-zinc-50/50 p-4 sm:p-6 lg:p-8">
-                    <div className="mx-auto max-w-7xl">
+                <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 relative" style={{ backgroundColor: "#f5f5f5" }}>
+                    {/* Ship watermark — fixed behind content */}
+                    <ShipsBackground />
+                    {/* Page content above the pattern */}
+                    <div className="mx-auto max-w-7xl relative" style={{ zIndex: 1 }}>
                         {children}
                     </div>
                 </main>

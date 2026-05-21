@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense, useMemo } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import LeadSearchBar from "@/components/LeadSearchBar";
+import TopBuyerCard from "@/components/TopBuyerCard";
 import {
     Search,
     MapPin,
@@ -40,6 +41,13 @@ function LeadsPageContent() {
     const [selectedBuyerForList, setSelectedBuyerForList] = useState<string | null>(null);
     const [selectedBuyerForSequence, setSelectedBuyerForSequence] = useState<string | null>(null);
 
+    // ── Top Performing Buyers state ──────────────────────────────────────────
+    const [topBuyers, setTopBuyers] = useState<any[]>([]);
+    const [topFilters, setTopFilters] = useState({ country: '', industry: '', productCategory: '' });
+    const [topLoading, setTopLoading] = useState(false);
+    const [savedTopLeads, setSavedTopLeads] = useState<Set<string>>(new Set());
+    const [savingTopLeadId, setSavingTopLeadId] = useState<string | null>(null);
+
     const itemsPerPage = 10;
 
     useEffect(() => {
@@ -71,6 +79,38 @@ function LeadsPageContent() {
         setCurrentPage(1); // Reset page on new search
         fetchResults();
     }, [query]);
+
+    // ── Fetch Top Performing Buyers ──────────────────────────────────────────
+    useEffect(() => {
+        const loadTopBuyers = async () => {
+            setTopLoading(true);
+            try {
+                const params = new URLSearchParams();
+                if (topFilters.country) params.set('country', topFilters.country);
+                if (topFilters.industry) params.set('industry', topFilters.industry);
+                if (topFilters.productCategory) params.set('productCategory', topFilters.productCategory);
+                const url = `http://localhost:5000/api/buyers/top-performing?${params.toString()}`;
+                const res = await fetch(url);
+                if (res.ok) setTopBuyers(await res.json());
+            } catch { /* silently fail */ }
+            finally { setTopLoading(false); }
+        };
+        loadTopBuyers();
+    }, [topFilters]);
+
+    const handleSaveTopLead = async (buyerId: string) => {
+        setSavingTopLeadId(buyerId);
+        try {
+            const res = await fetch('http://localhost:5000/api/crm/leads', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ buyerId, status: 'New Lead' })
+            });
+            if (res.ok) setSavedTopLeads(prev => new Set(prev).add(buyerId));
+        } catch { /* fail silently */ }
+        finally { setSavingTopLeadId(null); }
+    };
+
 
     const handleSort = (key: string) => {
         let direction: 'asc' | 'desc' = 'asc';
@@ -140,7 +180,85 @@ function LeadsPageContent() {
             {/* AI Search Bar */}
             <LeadSearchBar />
 
-            {/* Results Section */}
+            {/* ── Top Performing Buyers (shown only when no search is active) ── */}
+            {!hasSearched && (
+                <div className="mt-2">
+                    {/* Section Header */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
+                        <div>
+                            <h2 className="text-xl font-bold text-zinc-900">Top Performing Buyers</h2>
+                            <p className="text-sm text-zinc-500 mt-0.5">Based on verified trade activity &amp; lead quality score</p>
+                        </div>
+
+                        {/* Filters */}
+                        <div className="flex flex-wrap gap-2">
+                            <select
+                                value={topFilters.country}
+                                onChange={e => setTopFilters(f => ({ ...f, country: e.target.value }))}
+                                className="text-sm border border-zinc-200 rounded-lg px-3 py-1.5 bg-white text-zinc-700 outline-none focus:border-blue-400 cursor-pointer"
+                            >
+                                <option value="">All Countries</option>
+                                {["United Arab Emirates", "Saudi Arabia", "Germany", "India", "United Kingdom", "USA","China","France"].map(c => (
+                                    <option key={c} value={c}>{c}</option>
+                                ))}
+                            </select>
+                            <select
+                                value={topFilters.industry}
+                                onChange={e => setTopFilters(f => ({ ...f, industry: e.target.value }))}
+                                className="text-sm border border-zinc-200 rounded-lg px-3 py-1.5 bg-white text-zinc-700 outline-none focus:border-blue-400 cursor-pointer"
+                            >
+                                <option value="">All Industries</option>
+                                {["Agriculture", "Textile", "Electronics", "Pharmaceutical", "Food", "Chemical", "Furniture"].map(i => (
+                                    <option key={i} value={i}>{i}</option>
+                                ))}
+                            </select>
+                            <select
+                                value={topFilters.productCategory}
+                                onChange={e => setTopFilters(f => ({ ...f, productCategory: e.target.value }))}
+                                className="text-sm border border-zinc-200 rounded-lg px-3 py-1.5 bg-white text-zinc-700 outline-none focus:border-blue-400 cursor-pointer"
+                            >
+                                <option value="">All Products</option>
+                                {["Fertilizer","Rice","Spice","Textile","Electronics","Machinery","Chemicals"].map(p => (
+                                    <option key={p} value={p}>{p}</option>
+                                ))}
+                            </select>
+                            {(topFilters.country || topFilters.industry || topFilters.productCategory) && (
+                                <button
+                                    onClick={() => setTopFilters({ country: '', industry: '', productCategory: '' })}
+                                    className="text-xs text-blue-600 hover:text-blue-800 border border-blue-200 rounded-lg px-3 py-1.5 bg-blue-50 transition-colors"
+                                >
+                                    Clear Filters
+                                </button>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Cards Grid */}
+                    {topLoading ? (
+                        <div className="flex justify-center py-16">
+                            <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+                        </div>
+                    ) : topBuyers.length > 0 ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                            {topBuyers.map((buyer) => (
+                                <TopBuyerCard
+                                    key={buyer.id}
+                                    buyer={buyer}
+                                    onSave={handleSaveTopLead}
+                                    isSaving={savingTopLeadId === buyer.id}
+                                    isSaved={savedTopLeads.has(buyer.id)}
+                                />
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="py-16 text-center text-zinc-400 border-2 border-dashed border-zinc-200 rounded-2xl">
+                            <p className="font-medium">No top buyers found for these filters.</p>
+                            <p className="text-sm mt-1">Try clearing filters or adding more buyer data to your database.</p>
+                        </div>
+                    )}
+                </div>
+            )}
+
             {hasSearched && (
                 <div className="bg-white rounded-2xl shadow-sm border border-zinc-100 overflow-hidden">
                     <div className="px-6 py-4 border-b border-zinc-200 flex justify-between items-center bg-zinc-50/50">
